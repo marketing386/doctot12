@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Онлайн-педиатр, которому можно доверять</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vollkorn:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --c1:#87dfe9;         /* пастельный лазурный */
+      --c2:#a77aca;         /* лавандовый */
+      --c-dark:#111827;
+      --c-muted:#6b7280;
+      --radius-xl:32px;
+      --shadow-soft:0 18px 45px rgba(15,23,42,.18);
+      --shadow-chip:0 10px 25px rgba(15,23,42,.18);
+      --transition-fast:.22s ease-out;
+      --transition-med:.35s ease-out;
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    html{
+      max-width:100%;
+      overflow-x:hidden;
+    }
+
+    body{
+      font-family:"Vollkorn", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--c-dark);
+      min-height:100vh;
+      -webkit-font-smoothing:antialiased;
+      background:transparent;
+      max-width:100%;
+      overflow-x:hidden;
+    }
+
+    img{
+      max-width:100%;
+      display:block;
+    }
+
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
+
+    button{
+      font-family:inherit;
+    }
+
+    /* Анимированный фон с медицинскими дудлами */
+
+    .med-animated-bg{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      pointer-events:none;
+      overflow:hidden;
+      background:
+        radial-gradient(1200px 600px at 50% 20%, rgba(255,255,255,.9), rgba(255,255,255,.25)),
+        linear-gradient(135deg,
+          color-mix(in srgb, var(--c1) 85%, white 15%),
+          color-mix(in srgb, var(--c2) 85%, white 15%)
+        );
+    }
+
+    .med-animated-bg::before,
+    .med-animated-bg::after{
+      content:"";
+      position:absolute;
+      inset:-20%;
+      background-repeat:repeat;
+      background-size:900px 520px;
+      opacity:.22;
+      filter:drop-shadow(0 10px 25px rgba(0,0,0,.06));
+      will-change:transform, background-position;
+    }
+
+    .med-animated-bg::before{
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='520' viewBox='0 0 900 520'%3E%3Cg fill='none' stroke='%23111' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(60 60) rotate(-18)'%3E%3Crect x='0' y='0' width='90' height='34' rx='17'/%3E%3Cline x1='45' y1='0' x2='45' y2='34'/%3E%3Ccircle cx='18' cy='11' r='2'/%3E%3Ccircle cx='28' cy='23' r='2'/%3E%3Ccircle cx='62' cy='11' r='2'/%3E%3Ccircle cx='72' cy='23' r='2'/%3E%3C/g%3E%3Cg transform='translate(310 50) rotate(12)'%3E%3Crect x='0' y='10' width='90' height='22' rx='6'/%3E%3Cline x1='15' y1='10' x2='15' y2='32'/%3E%3Cline x1='30' y1='10' x2='30' y2='32'/%3E%3Cline x1='90' y1='21' x2='118' y2='21'/%3E%3Cline x1='118' y1='21' x2='132' y2='7'/%3E%3Cline x1='118' y1='21' x2='132' y2='35'/%3E%3C/g%3E%3Cg transform='translate(640 90) rotate(-8)'%3E%3Cpath d='M20 10v35c0 20 20 25 30 25s30-5 30-25V10'/%3E%3Cpath d='M50 70v20c0 18 18 28 35 28'/%3E%3Ccircle cx='92' cy='118' r='16'/%3E%3Cpath d='M92 102v-14'/%3E%3C/g%3E%3Cg transform='translate(160 200) rotate(8)'%3E%3Cpath d='M50 85C20 62 10 48 10 33 10 20 20 10 33 10c8 0 14 4 17 9 3-5 9-9 17-9 13 0 23 10 23 23 0 15-10 29-40 52z'/%3E%3C/g%3E%3Cg transform='translate(430 210) rotate(-10)'%3E%3Ccircle cx='40' cy='40' r='16'/%3E%3Cpath d='M40 10v-8M40 78v-8M10 40h-8M78 40h-8M18 18l-6-6M62 62l-6-6M18 62l-6 6M62 18l-6 6'/%3E%3Ccircle cx='34' cy='36' r='2'/%3E%3Ccircle cx='46' cy='44' r='2'/%3E%3C/g%3E%3Cg transform='translate(720 260) rotate(14)'%3E%3Cpath d='M25 10v70a22 22 0 1 0 30 0V10a15 15 0 0 0-30 0z'/%3E%3Cline x1='40' y1='22' x2='40' y2='62'/%3E%3C/g%3E%3Cg transform='translate(70 360) rotate(6)'%3E%3Cpath d='M20 55c-10 0-18-8-18-18 0-9 6-16 14-18 2-9 10-16 20-16 7 0 13 3 17 8h52c4-5 10-8 17-8 10 0 18 7 20 16 8 2 14 9 14 18 0 10-8 18-18 18-2 9-10 16-20 16-7 0-13-3-17-8H53c-4 5-10 8-17 8-10 0-18-7-20-16z'/%3E%3C/g%3E%3Cg transform='translate(440 345) rotate(-7)'%3E%3Cpath d='M10 10h70l20 20v80H10z'/%3E%3Cpath d='M80 10v20h20'/%3E%3Cline x1='22' y1='48' x2='88' y2='48'/%3E%3Cline x1='22' y1='64' x2='88' y2='64'/%3E%3Cline x1='22' y1='80' x2='76' y2='80'/%3E%3C/g%3E%3Cg transform='translate(760 390) rotate(-12)'%3E%3Cpath d='M35 10h30'/%3E%3Cpath d='M42 10v18c0 6-12 10-12 18v66c0 16 40 16 40 0V46c0-8-12-12-12-18V10'/%3E%3Cpath d='M40 76h20'/%3E%3Cpath d='M50 66v20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      animation:bgDrift1 36s linear infinite;
+    }
+
+    .med-animated-bg::after{
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='520' viewBox='0 0 900 520'%3E%3Cg fill='none' stroke='%23111' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(90 110) rotate(10)'%3E%3Crect x='0' y='0' width='90' height='34' rx='17'/%3E%3Cline x1='45' y1='0' x2='45' y2='34'/%3E%3C/g%3E%3Cg transform='translate(360 120) rotate(-14)'%3E%3Ccircle cx='40' cy='40' r='16'/%3E%3Cpath d='M40 10v-8M40 78v-8M10 40h-8M78 40h-8'/%3E%3C/g%3E%3Cg transform='translate(610 140) rotate(7)'%3E%3Cpath d='M50 85C20 62 10 48 10 33 10 20 20 10 33 10c8 0 14 4 17 9 3-5 9-9 17-9 13 0 23 10 23 23 0 15-10 29-40 52z'/%3E%3C/g%3E%3Cg transform='translate(200 320) rotate(-8)'%3E%3Cpath d='M25 10v70a22 22 0 1 0 30 0V10a15 15 0 0 0-30 0z'/%3E%3C/g%3E%3Cg transform='translate(520 310) rotate(16)'%3E%3Crect x='0' y='10' width='90' height='22' rx='6'/%3E%3Cline x1='90' y1='21' x2='118' y2='21'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity:.14;
+      transform:scale(1.08);
+      animation:bgDrift2 24s linear infinite;
+    }
+
+    @keyframes bgDrift1{
+      0%{background-position:0 0; transform:translate3d(0,0,0);}
+      100%{background-position:900px 520px; transform:translate3d(-2%,-1.2%,0);}
+    }
+    @keyframes bgDrift2{
+      0%{background-position:0 0; transform:translate3d(0,0,0) scale(1.08);}
+      100%{background-position:-900px 520px; transform:translate3d(2%,1.2%,0) scale(1.08);}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      .med-animated-bg::before,
+      .med-animated-bg::after{
+        animation:none;
+      }
+    }
+
+    /* Контейнер и секции */
+
+    .page-wrap{
+      width:100%;
+      max-width:1120px;
+      margin:0 auto;
+      padding:18px 16px 72px;
+    }
+
+    section{
+      margin-bottom:72px;
+    }
+
+    .section-title{
+      font-size:30px;
+      line-height:1.1;
+      margin-bottom:18px;
+    }
+
+    .section-lead{
+      font-size:16px;
+      color:var(--c-muted);
+      margin-bottom:24px;
+    }
+
+    /* Шапка */
+
+    .site-header{
+      position:sticky;
+      top:0;
+      z-index:20;
+      padding:10px 0 14px;
+      backdrop-filter:blur(18px);
+      background:linear-gradient(to bottom, rgba(255,255,255,.9), rgba(255,255,255,.76));
+      border-bottom:1px solid rgba(148,163,184,.35);
+    }
+
+    .header-inner{
+      max-width:1120px;
+      margin:0 auto;
+      padding:0 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      position:relative;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .brand-logo{
+      width:40px;
+      height:40px;
+      border-radius:999px;
+      background:linear-gradient(135deg, var(--c2), var(--c1));
+      box-shadow:0 10px 25px rgba(15,23,42,.28);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      flex-shrink:0;
+    }
+
+    .brand-logo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .brand-text{
+      display:flex;
+      flex-direction:column;
+      font-family:"Inter", system-ui, sans-serif;
+      line-height:1.1;
+    }
+
+    .brand-title{
+      font-weight:600;
+      font-size:16px;
+    }
+
+    .brand-sub{
+      font-size:12px;
+      color:var(--c-muted);
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .nav-link{
+      font-family:"Inter", system-ui, sans-serif;
+      font-size:13px;
+      padding:7px 11px;
+      border-radius:999px;
+      background:rgba(255,255,255,.7);
+      border:1px solid transparent;
+      transition:
+        background var(--transition-fast),
+        color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        transform var(--transition-fast),
+        border-color var(--transition-fast);
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    .nav-link:hover{
+      background:linear-gradient(135deg, var(--c2), var(--c1));
+      color:#fff;
+      border-color:rgba(255,255,255,.7);
+      box-shadow:0 10px 25px rgba(15,23,42,.28);
+      transform:translateY(-1px);
+    }
+
+    .nav-link-primary{
+      background:linear-gradient(135deg, var(--c2), var(--c1));
+      color:#fff;
+      box-shadow:0 10px 25px rgba(15,23,42,.26);
+      font-weight:600;
+    }
+
+    .nav-link-primary:hover{
+      filter:brightness(1.03);
+      transform:translateY(-1px) scale(1.01);
+    }
+
+    .header-burger{
+      display:none;
+    }
+
+    /* Hero */
+
+    .hero{
+      display:grid;
+      grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);
+      gap:32px;
+      align-items:center;
+      margin-top:24px;
+    }
+
+    .hero-kicker{
+      font-family:"Inter", system-ui, sans-serif;
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--c-muted);
+      margin-bottom:12px;
+    }
+
+    .hero-title{
+      font-size:34px;
+      line-height:1.1;
+      margin-bottom:16px;
+    }
+
+    .hero-sub{
+      font-size:16px;
+      color:var(--c-muted);
+      margin-bottom:20px;
+    }
+
+    .hero-badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:24px;
+    }
+
+    .badge-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.9);
+      box-shadow:0 12px 30px rgba(15,23,42,.18);
+      font-size:12px;
+      font-family:"Inter", system-ui, sans-serif;
+    }
+
+    .badge-dot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:radial-gradient(circle at 30% 30%, #f97316, #be185d);
+      box-shadow:0 0 0 4px rgba(251,113,133,.35);
+    }
+
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      font-family:"Inter", system-ui, sans-serif;
+      border-radius:999px;
+      padding:11px 20px;
+      font-size:14px;
+      font-weight:500;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      background:#fff;
+      color:var(--c-dark);
+      box-shadow:0 14px 35px rgba(15,23,42,.18);
+      transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background var(--transition-fast),
+        color var(--transition-fast),
+        filter var(--transition-fast);
+    }
+
+    .btn-primary{
+      background:linear-gradient(135deg, var(--c2), var(--c1));
+      color:#fff;
+    }
+
+    .btn-primary:hover{
+      filter:brightness(1.05);
+      transform:translateY(-1px) scale(1.01);
+      box-shadow:0 18px 40px rgba(15,23,42,.32);
+    }
+
+    .btn-outline{
+      background:rgba(255,255,255,.9);
+    }
+
+    .btn-outline:hover{
+      background:#fff;
+      transform:translateY(-1px);
+    }
+
+    .btn-ghost{
+      background:transparent;
+      box-shadow:none;
+      padding-inline:4px;
+      font-size:13px;
+      color:var(--c-muted);
+    }
+
+    .btn-ghost span{
+      text-decoration:underline;
+      text-decoration-style:dotted;
+    }
+
+    .hero-media{
+      position:relative;
+      display:flex;
+      justify-content:center;
+    }
+
+    .hero-photo-card{
+      position:relative;
+      width:min(360px,100%);
+      border-radius:32px;
+      overflow:hidden;
+      box-shadow:var(--shadow-soft);
+      background:#0f172a;
+      transform:translateY(0);
+      animation:floatHero 9s ease-in-out infinite;
+    }
+
+    .hero-photo-card img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .hero-photo-overlay{
+      position:absolute;
+      inset:auto 14px 16px 14px;
+      border-radius:24px;
+      padding:10px 14px;
+      background:linear-gradient(135deg, rgba(15,23,42,.92), rgba(15,23,42,.8));
+      color:#e5e7eb;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      font-family:"Inter", system-ui, sans-serif;
+      font-size:11px;
+    }
+
+    .hero-photo-overlay strong{
+      display:block;
+      font-size:12px;
+      margin-bottom:3px;
+      color:#f9fafb;
+    }
+
+    .hero-photo-tag{
+      padding:4px 8px;
+      border-radius:999px;
+      background:rgba(15,23,42,.7);
+      font-size:10px;
+      white-space:nowrap;
+    }
+
+    @keyframes floatHero{
+      0%,100%{transform:translateY(0);}
+      50%{transform:translateY(-6px);}
+    }
+
+    .hero-strip{
+      margin-top:20px;
+      display:flex;
+      align-items:center;
+      gap:16px;
+    }
+
+    .hero-strip-photo{
+      width:62px;
+      height:62px;
+      border-radius:999px;
+      overflow:hidden;
+      box-shadow:0 10px 30px rgba(15,23,42,.26);
+      flex-shrink:0;
+    }
+
+    .hero-strip-rail{
+      flex:1 1 auto;
+      border-radius:999px;
+      background:rgba(255,255,255,.9);
+      box-shadow:0 20px 50px rgba(15,23,42,.28);
+      padding:6px 10px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero-strip-inner{
+      display:flex;
+      gap:8px;
+      white-space:nowrap;
+      animation:stripScroll 20s linear infinite;
+    }
+
+    .hero-strip-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      background:#f9fafb;
+      font-family:"Inter", system-ui, sans-serif;
+      font-size:12px;
+      box-shadow:0 10px 25px rgba(15,23,42,.12);
+    }
+
+    .chip-dot{
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:radial-gradient(circle at 30% 30%, var(--c1), var(--c2));
+    }
+
+    @keyframes stripScroll{
+      0%{transform:translateX(0);}
+      100%{transform:translateX(-50%);}
+    }
+
+    /* Карточки / блоки */
+
+    .card{
+      border-radius:var(--radius-xl);
+      background:rgba(255,255,255,.96);
+      box-shadow:var(--shadow-soft);
+      padding:22px 22px 20px;
+      backdrop-filter:blur(14px);
+    }
+
+    .about-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
+      gap:22px;
+      align-items:flex-start;
+    }
+
+    .about-main p{
+      font-size:15px;
+      line-height:1.55;
+      color:var(--c-muted);
+      margin-bottom:14px;
+    }
+
+    .about-bullets{
+      font-size:14px;
+      color:var(--c-muted);
+      padding-left:18px;
+      margin-bottom:14px;
+    }
+
+    .about-bullets li+li{
+      margin-top:6px;
+    }
+
+    .about-aside{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .about-highlight{
+      font-size:14px;
+      color:#111827;
+      background:linear-gradient(135deg, rgba(135,223,233,.16), rgba(167,122,202,.16));
+      border-radius:18px;
+      padding:10px 14px;
+    }
+
+    .about-highlight ul{
+      padding-left:16px;
+      margin-top:6px;
+      font-size:13px;
+      color:var(--c-muted);
+    }
+
+    .about-highlight li+li{
+      margin-top:4px;
+    }
+
+    .about-meta{
+      font-size:13px;
+      color:var(--c-muted);
+    }
+
+    /* Форматы */
+
+    .formats-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:16px;
+    }
+
+    .format-card{
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:10px;
+      padding:18px 16px 16px;
+      border-radius:24px;
+      background:rgba(255,255,255,.98);
+      box-shadow:0 16px 40px rgba(15,23,42,.18);
+      border:1px solid rgba(148,163,184,.28);
+      position:relative;
+      overflow:hidden;
+      transform:translateY(0);
+      transition:
+        transform var(--transition-med),
+        box-shadow var(--transition-med);
+    }
+
+    .format-card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 20px 48px rgba(15,23,42,.26);
+    }
+
+    .format-icon{
+      width:30px;
+      height:30px;
+      border-radius:999px;
+      background:radial-gradient(circle at 20% 20%, var(--c2), var(--c1));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
+      font-size:16px;
+      font-family:"Inter", system-ui, sans-serif;
+      margin-bottom:6px;
+      box-shadow:0 10px 25px rgba(15,23,42,.22);
+    }
+
+    .format-title{
+      font-size:15px;
+      font-weight:600;
+      margin-bottom:4px;
+    }
+
+    .format-desc{
+      font-size:13px;
+      color:var(--c-muted);
+      margin-bottom:6px;
+    }
+
+    .format-meta{
+      font-size:12px;
+      color:var(--c-muted);
+      margin-bottom:6px;
+    }
+
+    .format-price{
+      font-family:"Inter", system-ui, sans-serif;
+      font-size:15px;
+      font-weight:600;
+      margin-bottom:8px;
+    }
+
+    .format-footer{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-top:auto;
+    }
+
+    .format-chip{
+      font-size:11px;
+      font-family:"Inter", system-ui, sans-serif;
+      padding:4px 8px;
+      border-radius:999px;
+      background:rgba(135,223,233,.18);
+      color:#0f172a;
+      white-space:nowrap;
+    }
+
+    .btn-small{
+      padding:7px 12px;
+      font-size:12px;
+      box-shadow:0 10px 24px rgba(15,23,42,.18);
+    }
+
+    /* Чек-лист */
+
+    .checklist-wrap{
+      display:grid;
+      grid-template-columns:minmax(0,1.1fr) minmax(0,0.85fr);
+      gap:24px;
+      align-items:center;
+    }
+
+    .checklist-points{
+      font-size:14px;
+      color:var(--c-muted);
+      margin-bottom:14px;
+    }
+
+    .checklist-points li+li{
+      margin-top:4px;
+    }
+
+    .btn-checklist{
+      background:linear-gradient(135deg, var(--c2), var(--c1));
+      color:#fff;
+    }
+
+    .checklist-cover{
+      border-radius:26px;
+      overflow:hidden;
+      box-shadow:0 18px 44px rgba(15,23,42,.24);
+      background:#020617;
+    }
+
+    .checklist-cover img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    /* FAQ */
+
+    .faq-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .faq-item{
+      border-radius:18px;
+      background:rgba(255,255,255,.98);
+      box-shadow:0 12px 32px rgba(15,23,42,.18);
+      overflow:hidden;
+      cursor:pointer;
+      transition:
+        transform var(--transition-med),
+        box-shadow var(--transition-med);
+    }
+
+    .faq-item:hover{
+      transform:translateY(-2px);
+      box-shadow:0 16px 40px rgba(15,23,42,.22);
+    }
+
+    .faq-header{
+      padding:12px 14px 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      font-size:14px;
+    }
+
+    .faq-title{
+      font-weight:600;
+    }
+
+    .faq-toggle{
+      width:20px;
+      height:20px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      color:var(--c-muted);
+      flex-shrink:0;
+    }
+
+    .faq-body{
+      padding:0 14px 0;
+      max-height:0;
+      overflow:hidden;
+      font-size:13px;
+      color:var(--c-muted);
+      transition:max-height .28s ease, padding-bottom .28s.ease;
+    }
+
+    .faq-item.open .faq-body{
+      padding-bottom:12px;
+      max-height:260px;
+    }
+
+    .faq-item.open .faq-toggle{
+      background:linear-gradient(135deg, var(--c1), var(--c2));
+      color:#fff;
+      border-color:transparent;
+    }
+
+    /* Карусели сертификатов и отзывов – вид как на референсе */
+
+    .carousel-section-card{
+      border-radius:40px;
+      background:radial-gradient(circle at 50% 0, rgba(255,255,255,.98), rgba(255,255,255,.9));
+      box-shadow:0 30px 80px rgba(15,23,42,.35);
+      padding:26px 24px 30px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .carousel-shell{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .card-carousel{
+      position:relative;
+      width:100%;
+      max-width:880px;
+      margin:0 auto;
+      padding:26px 0 18px;
+      overflow:visible; /* чтобы были видны соседние карточки */
+    }
+
+    .carousel-track{
+      display:flex;
+      align-items:center;
+      gap:30px;
+      will-change:transform;
+      transition:transform .5s cubic-bezier(.22,.61,.36,1);
+    }
+
+    .carousel-item{
+      position:relative;
+      flex:0 0 60%;
+      max-width:60%;
+      border-radius:32px;
+      overflow:hidden;
+      background:#020617;
+      box-shadow:0 24px 60px rgba(15,23,42,.38);
+      transform:scale(.84);
+      opacity:.2;
+      filter:blur(3px);
+      transition:
+        transform .5s cubic-bezier(.22,.61,.36,1),
+        opacity .5s cubic-bezier(.22,.61,.36,1),
+        filter .5s cubic-bezier(.22,.61,.36,1);
+    }
+
+    .carousel-item img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .carousel-item.is-active{
+      transform:scale(1);
+      opacity:1;
+      filter:none;
+      z-index:3;
+    }
+
+    .carousel-item.is-prev,
+    .carousel-item.is-next{
+      transform:scale(.92);
+      opacity:.7;
+      filter:blur(1.5px);
+      z-index:2;
+    }
+
+    .carousel-arrow{
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      width:34px;
+      height:34px;
+      border-radius:999px;
+      border:none;
+      cursor:pointer;
+      background:rgba(15,23,42,.8);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+      box-shadow:0 12px 30px rgba(15,23,42,.45);
+      transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background var(--transition-fast),
+        opacity var(--transition-fast);
+      opacity:.92;
+      z-index:4;
+    }
+
+    .carousel-arrow:hover{
+      transform:translateY(-50%) scale(1.06);
+      box-shadow:0 16px 38px rgba(15,23,42,.6);
+      background:linear-gradient(135deg, var(--c2), var(--c1));
+    }
+
+    /* Стрелки ближе к границам центральной карточки, как на референсе */
+    .carousel-arrow.prev{
+      left:12%;
+    }
+    .carousel-arrow.next{
+      right:12%;
+    }
+
+    /* Контакты */
+
+    .contacts-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1.1fr) minmax(0,1.1fr);
+      gap:22px;
+      align-items:flex-start;
+    }
+
+    .card-contacts{
+      border-radius:var(--radius-xl);
+      background:rgba(255,255,255,.98);
+      box-shadow:var(--shadow-soft);
+      padding:18px 18px 16px;
+      font-family:"Inter", system-ui, sans-serif;
+      font-size:13px;
+    }
+
+    .contacts-top-title{
+      font-weight:600;
+      margin-bottom:10px;
+    }
+
+    .social-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:14px;
+    }
+
+    .social-icon{
+      width:32px;
+      height:32px;
+      border-radius:999px;
+      overflow:hidden;
+      box-shadow:0 10px 24px rgba(15,23,42,.22);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .social-icon img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .social-icon:hover{
+      transform:translateY(-2px) scale(1.04);
+      box-shadow:0 14px 32px rgba(15,23,42,.3);
+    }
+
+    .qr-row{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .qr-card{
+      border-radius:20px;
+      background:rgba(248,250,252,.98);
+      box-shadow:0 14px 34px rgba(15,23,42,.18);
+      padding:10px 10px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:center;
+    }
+
+    .qr-thumb{
+      width:90px;
+      height:90px;
+      border-radius:16px;
+      overflow:hidden;
+      background:#0f172a;
+    }
+
+    .qr-thumb img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+
+    .qr-title{
+      font-weight:600;
+      font-size:13px;
+    }
+
+    .qr-caption{
+      font-size:11px;
+      color:var(--c-muted);
+      text-align:center;
+    }
+
+    .ext-links{
+      margin-top:4px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    .ext-links a{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:13px;
+      color:var(--c2);
+    }
+
+    .ext-links a span{
+      text-decoration:underline;
+      text-decoration-thickness:1px;
+    }
+
+    .ext-links a::before{
+      content:"•";
+      color:var(--c2);
+    }
+
+    /* Форма */
+
+    .card-form{
+      border-radius:var(--radius-xl);
+      background:rgba(255,255,255,.98);
+      box-shadow:var(--shadow-soft);
+      padding:18px 20px 18px;
+      font-family:"Inter", system-ui, sans-serif;
+      font-size:13px;
+    }
+
+    .card-form h3{
+      font-family:"Vollkorn", serif;
+      font-size:20px;
+      margin-bottom:8px;
+    }
+
+    .card-form p{
+      font-size:13px;
+      color:var(--c-muted);
+      margin-bottom:14px;
+    }
+
+    .form-grid{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .form-field label{
+      display:block;
+      font-size:12px;
+      margin-bottom:4px;
+    }
+
+    .form-field input,
+    .form-field textarea,
+    .form-field select{
+      width:100%;
+      border-radius:12px;
+      border:1px solid rgba(148,163,184,.7);
+      padding:8px 10px;
+      font-family:inherit;
+      font-size:13px;
+      background:rgba(248,250,252,.95);
+      outline:none;
+      transition:border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+    }
+
+    .form-field input:focus,
+    .form-field textarea:focus,
+    .form-field select:focus{
+      border-color:var(--c2);
+      box-shadow:0 0 0 1px rgba(167,122,202,.5);
+      background:#fff;
+    }
+
+    .form-field textarea{
+      min-height:74px;
+      resize:vertical;
+    }
+
+    .form-footer{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:4px;
+    }
+
+    .policy-note{
+      font-size:11px;
+      color:var(--c-muted);
+    }
+
+    .policy-note a{
+      color:var(--c2);
+      font-weight:600;
+    }
+
+    .policy-note a:hover{
+      text-decoration:underline;
+    }
+
+    .submit-status{
+      font-size:11px;
+      min-height:15px;
+    }
+
+    .submit-status.ok{
+      color:#16a34a;
+    }
+
+    .submit-status.err{
+      color:#b91c1c;
+    }
+
+    /* Дисклеймер */
+
+    .disclaimer-card{
+      border-radius:var(--radius-xl);
+      padding:14px 18px;
+      background:linear-gradient(135deg,#fee2e2,#fecaca);
+      box-shadow:0 16px 40px rgba(185,28,28,.4);
+      font-family:"Inter", system-ui, sans-serif;
+      font-size:13px;
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      color:#7f1d1d;
+    }
+
+    .disclaimer-icon{
+      width:26px;
+      height:26px;
+      border-radius:999px;
+      background:#fb7185;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-top:2px;
+      box-shadow:0 12px 30px rgba(248,113,113,.8);
+      flex-shrink:0;
+    }
+
+    .disclaimer-title{
+      font-weight:700;
+      margin-bottom:4px;
+    }
+
+    /* Анимации появления */
+
+    .js-scroll{
+      opacity:0;
+      transform:translateY(18px);
+      transition:
+        opacity .4s ease-out,
+        transform .4s ease-out;
+    }
+
+    .js-scroll.visible{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    /* Адаптив */
+
+    @media (max-width:960px){
+      .hero{
+        grid-template-columns:1fr;
+      }
+
+      .hero-media{
+        order:-1;
+      }
+
+      .formats-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+
+      .checklist-wrap{
+        grid-template-columns:1fr;
+      }
+
+      .contacts-grid{
+        grid-template-columns:1fr;
+      }
+
+      .card-carousel{
+        max-width:720px;
+      }
+
+      .carousel-arrow.prev{
+        left:6%;
+      }
+      .carousel-arrow.next{
+        right:6%;
+      }
+    }
+
+    @media (max-width:720px){
+      .header-inner{
+        gap:10px;
+      }
+
+      .nav{
+        display:none;
+        position:absolute;
+        top:52px;
+        left:0;
+        right:0;
+        flex-direction:column;
+        align-items:flex-start;
+        background:rgba(255,255,255,.98);
+        padding:10px 16px 14px;
+        border-bottom:1px solid rgba(148,163,184,.25);
+        box-shadow:0 12px 30px rgba(15,23,42,.18);
+        z-index:15;
+      }
+
+      .nav-link{
+        width:100%;
+        justify-content:flex-start;
+      }
+
+      .header-burger{
+        display:flex;
+        width:32px;
+        height:32px;
+        border-radius:999px;
+        border:none;
+        background:rgba(255,255,255,.9);
+        box-shadow:0 10px 25px rgba(15,23,42,.24);
+        align-items:center;
+        justify-content:center;
+        cursor:pointer;
+        flex-shrink:0;
+      }
+
+      .header-burger span{
+        width:16px;
+        height:2px;
+        border-radius:999px;
+        background:#111827;
+        position:relative;
+      }
+
+      .header-burger span::before,
+      .header-burger span::after{
+        content:"";
+        position:absolute;
+        left:0;
+        right:0;
+        height:2px;
+        border-radius:999px;
+        background:#111827;
+      }
+
+      .header-burger span::before{
+        top:-5px;
+      }
+
+      .header-burger span::after{
+        bottom:-5px;
+      }
+
+      .hero{
+        margin-top:16px;
+      }
+
+      .section-title{
+        font-size:24px;
+      }
+
+      .formats-grid{
+        grid-template-columns:1fr;
+      }
+
+      .faq-grid{
+        grid-template-columns:1fr;
+      }
+
+      .card-carousel{
+        max-width:100%;
+      }
+
+      .carousel-item{
+        flex:0 0 80%;
+        max-width:80%;
+      }
+
+      .carousel-arrow.prev{
+        left:10px;
+      }
+      .carousel-arrow.next{
+        right:10px;
+      }
+
+      .page-wrap{
+        padding-inline:14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="med-animated-bg" aria-hidden="true"></div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-logo">
+        <img src="images/logo-doc-ladoshki.png" alt="Логотип онлайн-педиатра">
+      </div>
+      <div class="brand-text">
+        <div class="brand-title">Артём Логачёв</div>
+        <div class="brand-sub">онлайн-педиатр, папа двух дочек</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a href="#about" class="nav-link">Обо мне</a>
+      <a href="#formats" class="nav-link">Услуги</a>
+      <a href="#checklist" class="nav-link">Чек-лист</a>
+      <a href="#faq" class="nav-link">FAQ</a>
+      <a href="#contacts" class="nav-link">Контакты</a>
+      <a href="#contacts" class="nav-link nav-link-primary">Оставить заявку</a>
+    </nav>
+
+    <button class="header-burger" type="button" aria-label="Меню">
+      <span></span>
+    </button>
+  </div>
+</header>
+
+<main class="page-wrap">
+
+  <!-- HERO -->
+
+  <section id="hero" class="hero js-scroll">
+    <div>
+      <div class="hero-kicker">Бережно, для современных родителей</div>
+      <h1 class="hero-title">Онлайн-педиатр, которому можно доверять</h1>
+      <p class="hero-sub">
+        Доказательная педиатрическая поддержка: быстрые ответы, разбор анализов
+        и уверенность в действиях — от одного вопроса до сопровождения на 3 месяца.
+      </p>
+
+      <div class="hero-badges">
+        <div class="badge-pill">
+          <span class="badge-dot"></span>
+          Понимаю как родитель, помогаю как врач
+        </div>
+        <div class="badge-pill">
+          4+ года практики и две дочки — Ника и Лира
+        </div>
+        <div class="badge-pill">
+          Доказательная медицина без лишних назначений
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn btn-primary" type="button" onclick="document.getElementById('contacts').scrollIntoView({behavior:'smooth'})">
+          Оставить заявку
+        </button>
+        <button class="btn btn-outline" type="button" onclick="document.getElementById('formats').scrollIntoView({behavior:'smooth'})">
+          Выбрать формат
+        </button>
+        <button class="btn btn-ghost" type="button" onclick="document.getElementById('checklist').scrollIntoView({behavior:'smooth'})">
+          <span>Посмотреть чек-лист «5 опасных лекарств-пустышек»</span>
+        </button>
+      </div>
+
+      <div class="hero-strip">
+        <div class="hero-strip-photo">
+          <img src="images/hero-strip-photo.jpg" alt="Артём Логачёв с ребёнком">
+        </div>
+        <div class="hero-strip-rail">
+          <div class="hero-strip-inner">
+            <div class="hero-strip-chip">
+              <span class="chip-dot"></span>
+              Поддержка, а не оценка
+            </div>
+            <div class="hero-strip-chip">
+              <span class="chip-dot"></span>
+              Помогаю отличать «красные флаги» от нормальных симптомов
+            </div>
+            <div class="hero-strip-chip">
+              <span class="chip-dot"></span>
+              Экономлю ваш бюджет и нервы, отсекая бесполезные анализы
+            </div>
+            <div class="hero-strip-chip">
+              <span class="chip-dot"></span>
+              Понимаю как родитель, помогаю как врач
+            </div>
+
+            <div class="hero-strip-chip">
+              <span class="chip-dot"></span>
+              Поддержка, а не оценка
+            </div>
+            <div class="hero-strip-chip">
+              <span class="chip-dot"></span>
+              Помогаю отличать «красные флаги» от нормальных симптомов
+            </div>
+            <div class="hero-strip-chip">
+              <span class="chip-dot"></span>
+              Экономлю ваш бюджет и нервы, отсекая бесполезные анализы
+            </div>
+            <div class="hero-strip-chip">
+              <span class="chip-dot"></span>
+              Понимаю как родитель, помогаю как врач
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-media">
+      <div class="hero-photo-card">
+        <img src="images/hero-doctor-main.jpg" alt="Онлайн-педиатр консультирует родителей" />
+        <div class="hero-photo-overlay">
+          <div>
+            <strong>Онлайн-поддержка для спокойных родителей</strong>
+            <span>Объясняю простыми словами без запугиваний и «волшебных» БАДов.</span>
+          </div>
+          <div class="hero-photo-tag">Ответ в течение 24 часов</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+
+  <section id="about" class="js-scroll">
+    <h2 class="section-title">Обо мне</h2>
+
+    <div class="about-grid card">
+      <div class="about-main">
+        <p>
+          Здравствуйте! Меня зовут Логачёв Артём Сергеевич, я — врач-педиатр и папа двух дочек,
+          Ники и Лиры. Я изнутри знаю, каково это — не спать ночами, пугаться каждого чиха и
+          тонуть в море противоречивых советов от родственников и интернета.
+        </p>
+
+        <p>
+          Я создал это пространство для родителей, которые хотят заменить тревогу на знания,
+          опираясь на доказательную медицину, здравый смысл и живой человеческий разговор.
+        </p>
+
+        <ul class="about-bullets">
+          <li>объясняю простыми словами, что происходит с ребёнком и зачем нужны назначения;</li>
+          <li>помогаю отличать «надо срочно к врачу» от ситуаций, где можно выдохнуть;</li>
+          <li>показываю, как превратить аптечку из чемодана в аккуратную косметичку;</li>
+          <li>экономлю ваш бюджет и нервы, отсекая бесполезные препараты и анализы;</li>
+          <li>поддерживаю, а не оцениваю — здесь можно задавать любые «глупые» вопросы.</li>
+        </ul>
+
+        <p>
+          Веду блог о детском здоровье, развитии и жизни нашей семьи, провожу онлайн-консультации
+          и сопровождения для родителей, которые хотят растить детей спокойнее и увереннее.
+        </p>
+
+        <p class="about-meta">
+          Врач-педиатр, окончил Кировский ГМУ (диплом 2021&nbsp;г.)
+        </p>
+      </div>
+
+      <div class="about-aside">
+        <div class="about-highlight">
+          <strong>Я — педиатр, но даже я боялся.</strong>
+          <ul>
+            <li>Знал, как лечить колики и сбивать температуру, но всё равно просыпался ночью,
+              чтобы проверить, дышит ли ребёнок.</li>
+            <li>Понял, что моя задача — быть мостом между кабинетом врача и детской комнатой.</li>
+            <li>Сейчас помогаю родителям проходить этот путь спокойнее и увереннее.</li>
+          </ul>
+        </div>
+
+        <div class="about-highlight">
+          <strong>Сертификаты и обучение</strong>
+          <p style="margin-top:6px; font-size:13px; color:var(--c-muted);">
+            Постоянно повышаю квалификацию: курсы по доказательной педиатрии, медицинскому
+            блогингу, раннему выявлению особенностей развития и работе с анализами.
+            Подтверждение — мои сертификаты ниже.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORMATS -->
+
+  <section id="formats" class="js-scroll">
+    <h2 class="section-title">Выберите формат под вашу задачу</h2>
+    <p class="section-lead">
+      Форматы общения — от одного конкретного вопроса до длительного сопровождения.
+      Выберите то, что подходит вашей ситуации.
+    </p>
+
+    <div class="formats-grid">
+      <article class="format-card">
+        <div>
+          <div class="format-icon">?</div>
+          <h3 class="format-title">«Просто спросить»</h3>
+          <p class="format-desc">
+            Один конкретный вопрос и один развернутый ответ — чтобы быстро снять тревогу.
+          </p>
+          <p class="format-meta">
+            Мини-консультация в чате до 2 часов. Можно прислать фото, видео или анализы.
+          </p>
+          <div class="format-price">1&nbsp;000&nbsp;₽</div>
+        </div>
+        <div class="format-footer">
+          <div class="format-chip">1 вопрос · чат</div>
+          <button class="btn btn-primary btn-small" type="button" onclick="openDetails('details-ask')">
+            Подробнее
+          </button>
+        </div>
+      </article>
+
+      <article class="format-card">
+        <div>
+          <div class="format-icon">24</div>
+          <h3 class="format-title">Онлайн-консультация 24&nbsp;часа</h3>
+          <p class="format-desc">
+            В течение суток обсуждаем одну ситуацию, задаёте уточняющие вопросы.
+          </p>
+          <p class="format-meta">
+            Ответы в рабочее время с 09:00 до 21:00 по Москве.
+          </p>
+          <div class="format-price">2&nbsp;300&nbsp;₽</div>
+        </div>
+        <div class="format-footer">
+          <div class="format-chip">чат · аудио</div>
+          <button class="btn btn-primary btn-small" type="button" onclick="openDetails('details-24h')">
+            Подробнее
+          </button>
+        </div>
+      </article>
+
+      <article class="format-card">
+        <div>
+          <div class="format-icon">7</div>
+          <h3 class="format-title">Сопровождение по болезни 7&nbsp;дней</h3>
+          <p class="format-desc">
+            Ребёнок заболел? На связи всю неделю, следим за динамикой и корректируем тактику.
+          </p>
+          <p class="format-meta">
+            Разбор симптомов, «красных флагов» и схем лечения без лишних препаратов.
+          </p>
+          <div class="format-price">3&nbsp;900&nbsp;₽</div>
+        </div>
+        <div class="format-footer">
+          <div class="format-chip">неделя поддержки</div>
+          <button class="btn btn-primary btn-small" type="button" onclick="openDetails('details-7days')">
+            Подробнее
+          </button>
+        </div>
+      </article>
+
+      <article class="format-card">
+        <div>
+          <div class="format-icon">👶</div>
+          <h3 class="format-title">Сопровождение новорождённых</h3>
+          <p class="format-desc">
+            Поддержка по кормлению, сну, уходу и анализам в первый год жизни.
+          </p>
+          <p class="format-meta">
+            Форматы на 1 и 3 месяца. Ограниченное количество мест.
+          </p>
+          <div class="format-price">7&nbsp;000&nbsp;₽ · 17&nbsp;000&nbsp;₽</div>
+        </div>
+        <div class="format-footer">
+          <div class="format-chip">1–3 месяца · 24/7</div>
+          <button class="btn btn-primary btn-small" type="button" onclick="openDetails('details-newborn')">
+            Подробнее
+          </button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+
+  <section id="checklist" class="js-scroll">
+    <h2 class="section-title">Чек-лист «5 опасных лекарств-пустышек»</h2>
+
+    <div class="checklist-wrap card">
+      <div>
+        <p class="section-lead">
+          Краткий чек-лист о популярных «лекарствах», которые не работают или могут навредить.
+          Чтобы не тратить деньги и не перегружать организм ребёнка.
+        </p>
+
+        <ul class="checklist-points">
+          <li>коротко и по делу: что за препарат и почему его не стоит использовать;</li>
+          <li>альтернатива: что действительно важно сделать родителю;</li>
+          <li>фокус на безопасности и доказательной медицине.</li>
+        </ul>
+
+        <button class="btn btn-checklist" type="button" onclick="window.open('files/checklist-5-pustyshek.pdf','_blank')">
+          Скачать PDF чек-лист
+        </button>
+      </div>
+
+      <div class="checklist-cover">
+        <img src="images/checklist-cover.jpg" alt="Обложка чек-листа «5 опасных лекарств-пустышек»">
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+
+  <section id="faq" class="js-scroll">
+    <h2 class="section-title">Частые вопросы</h2>
+
+    <div class="faq-grid">
+      <article class="faq-item">
+        <div class="faq-header">
+          <div class="faq-title">Что выбрать: «Просто спросить», 24 часа или сопровождение?</div>
+          <div class="faq-toggle">+</div>
+        </div>
+        <div class="faq-body">
+          Если у вас один конкретный вопрос и нужен быстрый ответ — подойдёт формат
+          «Просто спросить». Если вопросов несколько по одной теме и требуется полноценная
+          переписка — выбирайте 24 часа. При болезни ребёнка и необходимости контроля
+          динамики — сопровождение 7&nbsp;дней. При новорождённом и множестве тем —
+          сопровождение на 1 или 3 месяца.
+        </div>
+      </article>
+
+      <article class="faq-item">
+        <div class="faq-header">
+          <div class="faq-title">Как проходит общение?</div>
+          <div class="faq-toggle">+</div>
+        </div>
+        <div class="faq-body">
+          Общаемся в закрытом чате в Telegram или на платформах Docma и Express.Doctor.
+          Можно присылать фото, видео и анализы. Отвечаю в рабочее время: с 09:00 до 21:00
+          по Москве. Ночью мы с вами спим, чтобы сохранять ресурс.
+        </div>
+      </article>
+
+      <article class="faq-item">
+        <div class="faq-header">
+          <div class="faq-title">В каких случаях онлайн-формат не подойдёт?</div>
+          <div class="faq-toggle">+</div>
+        </div>
+        <div class="faq-body">
+          При признаках экстренности: затруднённое дыхание, выраженная сонливость,
+          судороги, фебрильная лихорадка, повторная рвота фонтаном, признаки
+          обезвоживания, сильные боли, травмы, кровотечение. В этих ситуациях
+          нужна скорая помощь и очный осмотр.
+        </div>
+      </article>
+
+      <article class="faq-item">
+        <div class="faq-header">
+          <div class="faq-title">Можно ли прислать анализы и получить второе мнение?</div>
+          <div class="faq-toggle">+</div>
+        </div>
+        <div class="faq-body">
+          Да. Я помогаю расшифровать анализы, объясняю значения показателей и даю
+          второе мнение по назначениям других специалистов, опираясь на доказательную
+          базу. При необходимости подскажу, что обсудить с вашим очным врачом.
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+
+  <section id="reviews" class="js-scroll">
+    <h2 class="section-title">Отзывы родителей</h2>
+    <p class="section-lead">
+      Несколько отзывов от родителей, которые прошли со мной болезнь ребёнка,
+      наладили сон, питание и научились спокойнее относиться к детским симптомам.
+    </p>
+
+    <div class="carousel-section-card">
+      <div class="carousel-shell">
+        <div class="card-carousel" data-carousel="reviews">
+          <button class="carousel-arrow prev" type="button" data-carousel-prev>&lt;</button>
+          <div class="carousel-track">
+            <div class="carousel-item is-active">
+              <img src="images/review1.jpg" alt="Отзыв 1">
+            </div>
+            <div class="carousel-item">
+              <img src="images/review2.jpg" alt="Отзыв 2">
+            </div>
+            <div class="carousel-item">
+              <img src="images/review3.jpg" alt="Отзыв 3">
+            </div>
+            <div class="carousel-item">
+              <img src="images/review4.jpg" alt="Отзыв 4">
+            </div>
+            <div class="carousel-item">
+              <img src="images/review5.jpg" alt="Отзыв 5">
+            </div>
+          </div>
+          <button class="carousel-arrow next" type="button" data-carousel-next>&gt;</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CERTIFICATES -->
+
+  <section id="certificates" class="js-scroll">
+    <h2 class="section-title">Сертификаты и дипломы</h2>
+    <p class="section-lead">
+      Документы, подтверждающие образование, дополнительное обучение и развитие
+      в области доказательной педиатрии и смежных областях.
+    </p>
+
+    <div class="carousel-section-card">
+      <div class="carousel-shell">
+        <div class="card-carousel" data-carousel="certs">
+          <button class="carousel-arrow prev" type="button" data-carousel-prev>&lt;</button>
+          <div class="carousel-track">
+            <div class="carousel-item is-active">
+              <img src="images/cert1.png" alt="Сертификат Docma School">
+            </div>
+            <div class="carousel-item">
+              <img src="images/cert2.jpg" alt="Сертификат МедикУм">
+            </div>
+            <div class="carousel-item">
+              <img src="images/cert3.png" alt="Сертификат Doctor Pro">
+            </div>
+            <div class="carousel-item">
+              <img src="images/cert4.png" alt="Диплом педиатра">
+            </div>
+            <div class="carousel-item">
+              <img src="images/cert5.png" alt="Сертификат НМО">
+            </div>
+          </div>
+          <button class="carousel-arrow next" type="button" data-carousel-next>&gt;</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTS -->
+
+  <section id="contacts" class="js-scroll">
+    <h2 class="section-title">Контакты и запись</h2>
+    <p class="section-lead">
+      Заполните форму или нажмите на иконку сервиса — я отвечу в течение 24 часов
+      в рабочее время.
+    </p>
+
+    <div class="contacts-grid">
+      <div class="card-contacts">
+        <div class="contacts-top-title">Соцсети и мессенджеры</div>
+
+        <div class="social-row">
+          <a href="https://t.me/timmi_laury_bot" class="social-icon" target="_blank" aria-label="Telegram">
+            <img src="images/social-telegram.png" alt="">
+          </a>
+          <a href="https://vk.com/doc_ladoshki" class="social-icon" target="_blank" aria-label="VK">
+            <img src="images/social-vk.png" alt="">
+          </a>
+          <a href="https://www.instagram.com/doc_ladoshki" class="social-icon" target="_blank" aria-label="Instagram">
+            <img src="images/social-instagram.png" alt="">
+          </a>
+          <a href="https://www.tiktok.com/@doc_ladoshki" class="social-icon" target="_blank" aria-label="TikTok">
+            <img src="images/social-tiktok.png" alt="">
+          </a>
+          <a href="https://youtube.com/@doc_ladoshki" class="social-icon" target="_blank" aria-label="YouTube">
+            <img src="images/social-youtube.png" alt="">
+          </a>
+        </div>
+
+        <div class="qr-row">
+          <div class="qr-card">
+            <div class="qr-thumb">
+              <img src="images/qr-docma.png" alt="QR Docma">
+            </div>
+            <div class="qr-title">Docma</div>
+            <div class="qr-caption">Онлайн-консультации и сопровождение на платформе Docma.</div>
+          </div>
+
+          <div class="qr-card">
+            <div class="qr-thumb">
+              <img src="images/qr-expressdoctor.png" alt="QR Express.Doctor">
+            </div>
+            <div class="qr-title">Express.Doctor</div>
+            <div class="qr-caption">Быстрая онлайн-связь через сервис Express.Doctor.</div>
+          </div>
+        </div>
+
+        <div class="ext-links">
+          <a href="https://docmedartem.taplink.ws/" target="_blank">
+            <span>Дополнительный сайт (Taplink)</span>
+          </a>
+          <a href="https://dc24.docma.ru/logachev" target="_blank">
+            <span>Docma</span>
+          </a>
+          <a href="https://qr.express.doctor/?doctor_id=165339&amp;clinic_token=$2y$10$whKw9VaIT.bzoAyJrh5E7OJ3kl8GL/.DTq.UkejmvuxqiHL/Sxr6i" target="_blank">
+            <span>Express.Doctor</span>
+          </a>
+          <a href="https://t.me/timmi_laury_bot" target="_blank">
+            <span>Telegram Bot</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="card-form">
+        <h3>Оставить заявку на консультацию</h3>
+        <p>
+          Напишите немного о себе и запросе — я отвечу в течение 24 часов и
+          помогу выбрать формат работы.
+        </p>
+
+        <form id="contact-form">
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="name">Имя и возраст ребёнка *</label>
+              <input id="name" name="name" required placeholder="Например: Анна, сын 2,5 года">
+            </div>
+
+            <div class="form-field">
+              <label for="phone">Контакт для связи (телефон или Telegram) *</label>
+              <input id="phone" name="phone" required placeholder="+7 … или @username">
+            </div>
+
+            <div class="form-field">
+              <label for="format">Предпочитаемый формат</label>
+              <select id="format" name="format">
+                <option value="">Пока не определились</option>
+                <option>«Просто спросить»</option>
+                <option>Онлайн-консультация 24 часа</option>
+                <option>Сопровождение по болезни 7 дней</option>
+                <option>Сопровождение новорождённого 1 месяц</option>
+                <option>Сопровождение новорождённого 3 месяца</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="message">Кратко опишите ваш запрос *</label>
+              <textarea id="message" name="message" required placeholder="Например: частые простуды, непонятные анализы, прикорм, сон и т.д."></textarea>
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <button class="btn btn-primary" type="submit">
+              Отправить заявку
+            </button>
+            <div class="policy-note">
+              Нажимая кнопку, вы соглашаетесь с
+              <a href="docs/politika-obrabotki-personalnyh-dannyh.pdf" target="_blank">
+                Политикой обработки персональных данных
+              </a>
+              и
+              <a href="docs/oferta-onlayn-konsultacii.pdf" target="_blank">
+                Офертой на онлайн-консультации
+              </a>.
+            </div>
+            <div id="submit-status" class="submit-status"></div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCLAIMER -->
+
+  <section id="disclaimer" class="js-scroll">
+    <div class="disclaimer-card">
+      <div class="disclaimer-icon">!</div>
+      <div>
+        <div class="disclaimer-title">
+          Важно: онлайн-консультация не заменяет очный приём
+        </div>
+        <div>
+          Консультация Логачёва Артёма Сергеевича не является аналогом медицинского приёма,
+          медицинского вмешательства и/или медицинской услугой, не может являться основанием
+          для постановки диагноза, назначения медикаментов или плана лечения и представляет
+          собой только возможность коммуникации с лицом, имеющим опыт работы в медицине.
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // Бургер-меню
+  document.querySelector('.header-burger')?.addEventListener('click', () => {
+    const nav = document.querySelector('.nav');
+    if(!nav) return;
+    const isOpen = nav.style.display === 'flex';
+    nav.style.display = isOpen ? 'none' : 'flex';
+  });
+
+  // Scroll reveal
+  const scrollEls = document.querySelectorAll('.js-scroll');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, {threshold:.18});
+  scrollEls.forEach(el => io.observe(el));
+
+  // FAQ
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.addEventListener('click', () => {
+      item.classList.toggle('open');
+    });
+  });
+
+  // Модальные "Подробнее" (простая заглушка)
+  function openDetails(id){
+    const mapping = {
+      'details-ask': 'Формат «Просто спросить» — мини-консультация в чате до 2 часов по одному вопросу. Подойдёт, если нужно быстро развеять сомнения и понять, что делать дальше.',
+      'details-24h': 'Формат 24 часа — личный чат с педиатром по одной ситуации. Можно задавать уточняющие вопросы, присылать фото и видео.',
+      'details-7days': 'Сопровождение по болезни — на связи 7 дней, следим за динамикой и корректируем тактику лечения.',
+      'details-newborn': 'Сопровождение новорождённого — системная поддержка по сну, кормлению, уходу и анализам на 1 или 3 месяца.'
+    };
+    alert(mapping[id] || 'Детальное описание формата будет уточнено при переписке.');
+  }
+
+  // Карусели (сертификаты и отзывы) с центральной карточкой как на референсе
+  function initCarousel(root){
+    const track = root.querySelector('.carousel-track');
+    const items = Array.from(root.querySelectorAll('.carousel-item'));
+    if(!track || !items.length) return;
+
+    let index = 0;
+
+    function update(){
+      // выравниваем активную карточку по центру контейнера
+      track.style.transform = 'translateX(0px)';
+      const rootRect = root.getBoundingClientRect();
+      const activeRect = items[index].getBoundingClientRect();
+      const rootCenter = rootRect.left + rootRect.width / 2;
+      const itemCenter = activeRect.left + activeRect.width / 2;
+      const diff = itemCenter - rootCenter;
+      track.style.transform = `translateX(${-diff}px)`;
+
+      items.forEach((item,i) => {
+        item.classList.remove('is-prev','is-next','is-active');
+        if(i === index){
+          item.classList.add('is-active');
+        }else if(i === (index - 1 + items.length) % items.length){
+          item.classList.add('is-prev');
+        }else if(i === (index + 1) % items.length){
+          item.classList.add('is-next');
+        }
+      });
+    }
+
+    function goNext(){
+      index = (index + 1) % items.length;
+      update();
+    }
+
+    function goPrev(){
+      index = (index - 1 + items.length) % items.length;
+      update();
+    }
+
+    root.querySelector('[data-carousel-prev]')?.addEventListener('click', goPrev);
+    root.querySelector('[data-carousel-next]')?.addEventListener('click', goNext);
+
+    window.addEventListener('resize', () => update());
+
+    update();
+  }
+
+  document.querySelectorAll('.card-carousel').forEach(initCarousel);
+
+  // Отправка формы
+  const contactForm = document.getElementById('contact-form');
+  const statusEl = document.getElementById('submit-status');
+
+  if(contactForm){
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if(!statusEl) return;
+
+      const formData = new FormData(contactForm);
+      const payload = {
+        name: formData.get('name')?.toString().trim(),
+        phone: formData.get('phone')?.toString().trim(),
+        format: formData.get('format')?.toString(),
+        message: formData.get('message')?.toString().trim()
+      };
+
+      if(!payload.name || !payload.phone || !payload.message){
+        statusEl.textContent = 'Пожалуйста, заполните обязательные поля.';
+        statusEl.className = 'submit-status err';
+        return;
+      }
+
+      statusEl.textContent = 'Отправляем заявку…';
+      statusEl.className = 'submit-status';
+
+      try{
+        const res = await fetch('/submit', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify(payload)
+        });
+
+        if(res.ok){
+          statusEl.textContent = 'Заявка отправлена. Я свяжусь с вами в ближайшее время.';
+          statusEl.className = 'submit-status ok';
+          contactForm.reset();
+        }else{
+          throw new Error('bad status');
+        }
+      }catch(err){
+        console.error(err);
+        statusEl.textContent = 'Не удалось отправить заявку. Попробуйте ещё раз или напишите в Telegram.';
+        statusEl.className = 'submit-status err';
+      }
+    });
+  }
+</script>
+</body>
+</html>
